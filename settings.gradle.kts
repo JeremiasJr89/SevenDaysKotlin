@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SevenDaysKotlin"
 include(":app")
- 
+include(":authentic")
