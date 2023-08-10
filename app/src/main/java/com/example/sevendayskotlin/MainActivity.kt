@@ -32,12 +32,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import coil.compose.AsyncImage
 import com.example.sevendayskotlin.model.Movie
 import com.example.sevendayskotlin.ui.theme.SevenDaysKotlinTheme
 import com.example.sevendayskotlin.ui.theme.screnn.MovieItem
+import com.example.sevendayskotlin.webClient.MovieWebClient
 
 class MainActivity : ComponentActivity() {
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -45,26 +51,26 @@ class MainActivity : ComponentActivity() {
                 Surface {
                     Box(modifier = Modifier.fillMaxSize()) {
 
-                        val movies = listOf(
-                            Movie(
-                                title = "The Shawshank Redemption",
-                                image = "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX128_CR0,3,128,176_AL_.jpg",
-                                rating = 9.2,
-                                year = 1994
-                            ),
-                            Movie(
-                                title = "The Godfather",
-                                image = "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UX128_CR0,1,128,176_AL_.jpg",
-                                rating = 9.2,
-                                year = 1972
-                            ),
-                            Movie(
-                                title = "The Dark Knight",
-                                image = "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_UX128_CR0,3,128,176_AL_.jpg",
-                                rating = 9.0,
-                                year = 2008
-                            )
-                        )
+                        /* val movies = listOf(
+                             Movie(
+                                 title = "The Shawshank Redemption",
+                                 image = "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX128_CR0,3,128,176_AL_.jpg",
+                                 rating = 9.2,
+                                 year = 1994
+                             ),
+                             Movie(
+                                 title = "The Godfather",
+                                 image = "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UX128_CR0,1,128,176_AL_.jpg",
+                                 rating = 9.2,
+                                 year = 1972
+                             ),
+                             Movie(
+                                 title = "The Dark Knight",
+                                 image = "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_UX128_CR0,3,128,176_AL_.jpg",
+                                 rating = 9.0,
+                                 year = 2008
+                             )
+                         )*/
                         LazyColumn {
                             items(movies) { movie -> MovieItem(movie) }
                         }
@@ -76,17 +82,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyComposable(movies: Any?) {
-    val image =
-        "https://www.imdb.com/title/tt6791350/mediaviewer/rm1222125825/?ref_=tt_ov_i"
+fun MyComposable(movies: List<Movie>) {
+    val image = "https://www.imdb.com/title/tt6791350/mediaviewer/rm1222125825/?ref_=tt_ov_i"
+    val client = MovieWebClient()
     Column(
         Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .border(
-                0.5.dp,
-                Color.Gray.copy(alpha = 0.5f),
-                RoundedCornerShape(20.dp)
+                0.5.dp, Color.Gray.copy(alpha = 0.5f), RoundedCornerShape(20.dp)
             )
     ) {
         AsyncImage(
@@ -97,8 +101,7 @@ fun MyComposable(movies: Any?) {
                 .height(200.dp)
                 .clip(
                     RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp
+                        topStart = 20.dp, topEnd = 20.dp
                     )
                 ),
             contentScale = ContentScale.Crop,
@@ -108,9 +111,7 @@ fun MyComposable(movies: Any?) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    top = 8.dp,
-                    start = 8.dp,
-                    end = 8.dp
+                    top = 8.dp, start = 8.dp, end = 8.dp
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -124,8 +125,7 @@ fun MyComposable(movies: Any?) {
                 )
                 Text(
                     "9.2",
-                    modifier = Modifier
-                        .padding(start = 2.dp),
+                    modifier = Modifier.padding(start = 2.dp),
                     color = Color(0xffeeeeee),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -138,14 +138,9 @@ fun MyComposable(movies: Any?) {
             )
         }
         Text(
-            "Guardians of the Galaxy Vol. 3",
-            modifier = Modifier.padding(
-                start = 16.dp,
-                top = 8.dp,
-                end = 16.dp
-            ),
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center
+            "Guardians of the Galaxy Vol. 3", modifier = Modifier.padding(
+                start = 16.dp, top = 8.dp, end = 16.dp
+            ), fontSize = 12.sp, textAlign = TextAlign.Center
         )
     }
 }
@@ -155,6 +150,6 @@ fun MyComposable(movies: Any?) {
 @Composable
 fun GreetingPreview() {
     SevenDaysKotlinTheme {
-        MyComposable(movies = null)
+        MyComposable()
     }
 }
